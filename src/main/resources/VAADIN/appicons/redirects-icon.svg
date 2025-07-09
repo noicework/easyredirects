@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  #%L
+  magkit-vanity-url Magnolia Module
+  %%
+  Copyright (C) 2013 - 2025 IBM iX
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+
+<svg width="32px" height="23px" viewBox="0 0 32 23" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
+    <title>redirect</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-2-Copy" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="255" stroke="#979797" transform="translate(0.000000, -5.000000)">
+            <path d="M31.7125195,11.3000258 C31.8904347,11.4803986 32,11.7274677 32,12 C32,12.5561352 31.5492199,13 30.9931545,13 L19.0068455,13 C18.4499488,13 18,12.5522847 18,12 C18,11.4438648 18.4507801,11 19.0068455,11 L28.5857864,11 L24.6071312,7.02134476 C24.2166069,6.63082047 24.2166069,5.99765549 24.6071312,5.6071312 C24.9976555,5.2166069 25.6308205,5.2166069 26.0213448,5.6071312 L31.678199,11.2639854 C31.6899955,11.275782 31.7014357,11.2877999 31.7125195,11.3000258 L31.7125195,11.3000258 L31.7125195,11.3000258 Z M1.00684547,19 C0.450780073,19 0,19.4438648 0,20 L0,20 C0,20.5522847 0.449948758,21 1.00684547,21 L12.9931545,21 C13.5492199,21 14,20.5561352 14,20 L14,20 C14,19.4477153 13.5500512,19 12.9931545,19 L1.00684547,19 L1.00684547,19 Z" id="Rectangle-1187" stroke="none" fill="#2A2630" fill-rule="evenodd"></path>
+            <path d="M31.363961,21.1213203 L25.7071068,26.7781746 C25.3165825,27.1686989 24.6834175,27.1686989 24.2928932,26.7781746 C23.9023689,26.3876503 23.9023689,25.7544853 24.2928932,25.363961 L28.6568542,21 L21.992017,21 C20.6321289,21 18.8463339,20.2605475 17.8810691,19.2952827 L12.7047173,14.1189309 C12.1107189,13.5249324 10.8478393,13.0049445 10.0122665,13.0085237 L1.00428352,13.04711 C0.452003836,13.0494757 0.0023748965,12.6036823 9.17430937e-06,12.0514027 C-0.00235654788,11.499123 0.443436798,11.049494 0.995716481,11.0471283 L10.0036995,11.0085421 C11.3726951,11.0026779 13.147778,11.7335645 14.1189309,12.7047173 L19.2952827,17.8810691 C19.8854144,18.4712009 21.1624766,19 21.992017,19 L31,19 C31.5522847,19 32,19.4477153 32,20 C32,20.3402316 31.8300876,20.640778 31.5704886,20.8214136 C31.5220344,20.9301909 31.4531919,21.0320895 31.363961,21.1213203 Z" id="Rectangle-365" stroke="none" fill="#95909E" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
