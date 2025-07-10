@@ -1,0 +1,14 @@
+datasource:
+  workspace: redirects
+
+model:
+  nodeType: mgnl:redirect
+  properties:
+    - name: redirect
+    - name: site
+    - name: link
+    - name: linkSuffix
+    - name: type
+      options:
+        - value: forward
+    - name: description

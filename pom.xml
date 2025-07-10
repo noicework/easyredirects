@@ -1,41 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>de.ibmix.magkit</groupId>
-        <artifactId>magkit-pom</artifactId>
-        <version>1.1.0</version>
-    </parent>
-    <artifactId>magkit-vanity-url</artifactId>
+    <groupId>work.noice</groupId>
+    <artifactId>easyredirects</artifactId>
     <version>1.7.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>magkit-vanity-url Magnolia Module</name>
-
-    <inceptionYear>2013</inceptionYear>
+    <name>easyredirects Magnolia Module</name>
 
     <properties>
-        <qrgen.version>3.0.1</qrgen.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <magnolia.version>6.2.19</magnolia.version>
+        <magnolia.content.types.version>2.0.1</magnolia.content.types.version>
+        <magnolia.site.version>2.0.2</magnolia.site.version>
+        <qrgen.version>2.6.0</qrgen.version>
+        <junit.version>4.13.2</junit.version>
+        <mockito.version>5.12.0</mockito.version>
+        <servlet.version>3.1.0</servlet.version>
+        <jsp.version>2.3.3</jsp.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>info.magnolia.boms</groupId>
+                <artifactId>magnolia-external-dependencies</artifactId>
+                <version>${magnolia.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>info.magnolia</groupId>
+                <artifactId>magnolia-project</artifactId>
+                <version>${magnolia.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>info.magnolia.ui</groupId>
             <artifactId>magnolia-ui-framework-jcr</artifactId>
+            <version>${magnolia.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>info.magnolia.core</groupId>
             <artifactId>magnolia-virtual-uri</artifactId>
+            <version>${magnolia.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>info.magnolia.types</groupId>
             <artifactId>magnolia-content-types</artifactId>
+            <version>${magnolia.content.types.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>info.magnolia.site</groupId>
             <artifactId>magnolia-site-jcr</artifactId>
+            <version>${magnolia.site.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -47,11 +74,13 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>javax.servlet.jsp-api</artifactId>
+            <version>${jsp.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -59,33 +88,36 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.14.15</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>1.14.15</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>info.magnolia</groupId>
             <artifactId>magnolia-core</artifactId>
+            <version>${magnolia.version}</version>
             <type>test-jar</type>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <suppressionsLocation>${project.basedir}/src/main/resources/checkstyle-suppressions.xml</suppressionsLocation>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <profiles>
         <profile>
@@ -96,12 +128,6 @@
         </profile>
     </profiles>
 
-    <scm>
-        <url>https://github.com/IBM/magkit-vanity-url.git</url>
-        <connection>scm:git:https://github.com/IBM/magkit-vanity-url.git</connection>
-        <developerConnection>scm:git:https://github.com/IBM/magkit-vanity-url.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
 
     <repositories>
         <repository>

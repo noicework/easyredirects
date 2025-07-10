@@ -3,11 +3,11 @@
 # Set script to exit on error
 set -e
 
-echo "Building vanity urls..."
+echo "Building easyredirects..."
 mvn clean package
 
 echo "Copying JAR to Magnolia Author instance..."
-cp target/magkit-vanity-url-1.7.1-SNAPSHOT.jar ~/Projects/mmp/apache-tomcat/webapps/magnoliaAuthor/WEB-INF/lib
+cp target/easyredirects-1.7.1-SNAPSHOT.jar ~/Projects/mmp/apache-tomcat/webapps/magnoliaAuthor/WEB-INF/lib
 
 echo "Shutting down Tomcat..."
 ~/Projects/mmp/apache-tomcat/bin/shutdown.sh

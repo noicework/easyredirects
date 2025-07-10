@@ -1,0 +1,117 @@
+!content-type:redirect
+name: redirects
+icon: redirects-icon
+label: redirects.app.label
+datasource:
+  workspace: redirects
+subApps:
+  browser:
+    label: redirects.app.label
+    actionbar:
+      sections:
+        item:
+          groups:
+            editActions:
+              items: []
+        deletedItem:
+          groups:
+            editActions:
+              items: []
+    actions:
+      export:
+        format: XML
+    workbench:
+      $type: filteringWorkbench
+      sortFilterOptions: true
+      filters:
+        - name: jcrPublishingStatus
+          icon: icon-spinner-full
+          $type: dropdownMultiselect
+          datasource:
+            $type: enumDatasource
+            enumeration: info.magnolia.ui.contentapp.configuration.column.StatusColumnDefinition$PublicationStatus
+            sorted: true
+        - name: site
+          icon: icon-globe
+          $type: dropdownMultiselect
+          datasource:
+            $type: siteListDatasource
+            sorted: true
+      contentViews:
+        tree:
+          filterableColumns: false
+          columns: !override
+            name:
+              $type: jcrComponentColumn
+              name: fromUrl
+              nodeTypeToComponents:
+                "mgnl:folder":
+                  icon: icon-folder-l
+                "mgnl:redirect":
+                  icon: icon-forward
+            site:
+              width: 100
+            toUrl:
+              $type: propertyColumn
+              name: toUrl
+              width: 400
+            jcrPublishingStatus:
+              $type: statusColumn
+            lastModified:
+              $type: dateColumn
+              name: mgnl:lastModified
+              width: 190
+    statusBar:
+      implementationClass: info.magnolia.ui.filteringapp.browser.FilteringStatusBar
+  detail:
+    datasource:
+      describeByProperty: fromUrl
+    form:
+      properties: !override
+        fromUrl:
+          $type: textField
+          required: true
+          validators:
+            valid:
+              $type: regexpValidator
+              errorMessage: redirect.errorMessage.invalid
+              pattern: ^/.+$
+          description: redirect.field.fromUrl.description
+        site:
+          $type: comboBoxField
+          defaultValue: fallback
+          required: true
+          datasource:
+            $type: siteListDatasource
+        toUrl:
+          $type: textField
+          required: true
+          description: redirect.field.toUrl.description
+        toUrlSuffix:
+          $type: textField
+        redirectType:
+          $type: radioButtonGroupField
+          defaultValue: 301
+          datasource:
+            $type: optionListDatasource
+            options:
+              - name: 301
+                value: 301
+              - name: 302
+                value: 302
+        usePattern:
+          $type: checkBoxField
+          label: redirect.field.usePattern.label
+          description: redirect.field.usePattern.description
+          defaultValue: false
+        description:
+          $type: textField
+          rows: 3
+    actions:
+      commit:
+        $type: commitAction
+      cancel:
+        $type: closeAction
+permissions:
+  roles:
+    canAccessRedirectsApp: canAccessRedirectsApp
