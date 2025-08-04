@@ -41,9 +41,6 @@ import static org.apache.commons.lang3.StringUtils.replaceOnce;
 /**
  * Alternative simple implementation for the {@link PublicUrlService}.
  * Uses just the configured server prefix for external link creation.
- *
- * @author frank.sommer
- * @since 16.10.14
  */
 public class SimplePublicUrlService implements PublicUrlService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplePublicUrlService.class);
