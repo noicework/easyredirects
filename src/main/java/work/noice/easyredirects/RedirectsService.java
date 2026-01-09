@@ -21,16 +21,15 @@ package work.noice.easyredirects;
  */
 
 import info.magnolia.jcr.util.NodeUtil;
-import info.magnolia.jcr.util.PropertyUtil;
 import info.magnolia.link.LinkUtil;
 import info.magnolia.module.site.NullSite;
 import org.apache.jackrabbit.value.StringValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -157,36 +156,16 @@ public class RedirectsService {
         }
         String prefix;
         
-        if (node != null) {
-            try {
-                String nodePath = node.getPath();
-                String redirect = getString(node, PN_REDIRECT, "");
-                String link = getString(node, PN_LINK, "");
-                LOGGER.debug("RedirectsService: Creating redirect URL for node: {}, redirect: {}, type: {}, link: {}, asExternal: {}, originSuffix: {}, extractedParams: {}", 
-                    nodePath, redirect, type, link, asExternal, originSuffix, extractedParams);
-            } catch (RepositoryException e) {
-                LOGGER.warn("RedirectsService: Error reading node properties for logging: {}", e.getMessage());
-            }
-        } else {
-            LOGGER.debug("RedirectsService: Creating redirect URL for null node, type: {}, asExternal: {}, originSuffix: {}, extractedParams: {}", 
-                type, asExternal, originSuffix, extractedParams);
-        }
-        
         if ("forward".equals(type)) {
             result = createForwardLink(node, extractedParams);
             prefix = FORWARD_PREFIX;
-            LOGGER.debug("RedirectsService: Created forward link: {}, using prefix: {}", result, prefix);
         } else {
             result = createTargetLink(node, asExternal, originSuffix, extractedParams);
             prefix = "301".equals(type) ? PERMANENT_PREFIX : REDIRECT_PREFIX;
-            LOGGER.debug("RedirectsService: Created target link: {}, redirect type: {}, using prefix: {}", result, type, prefix);
         }
         
         if (isNotEmpty(result)) {
             result = prefix + result;
-            LOGGER.debug("RedirectsService: Final redirect URL: {}", result);
-        } else {
-            LOGGER.debug("RedirectsService: Empty result for redirect URL creation");
         }
         
         return result;
@@ -252,9 +231,6 @@ public class RedirectsService {
                 linkValue = getString(node, PN_LINK, EMPTY);
             }
             
-            LOGGER.debug("RedirectsService: createTargetLink - node has toUrl: {}, link: {}, using: {}", 
-                getString(node, PN_TO_URL, "[empty]"), getString(node, PN_LINK, "[empty]"), linkValue);
-            
             if (isNotEmpty(linkValue)) {
                 // Check if this is a toUrl (redirect) before placeholder replacement
                 String toUrlValue = getString(node, PN_TO_URL, EMPTY);
@@ -270,20 +246,14 @@ public class RedirectsService {
                     if (!isForward) {
                         url = linkValue;
                     }
-                    LOGGER.debug("RedirectsService: External link detected: {}, isForward: {}, final url: {}", 
-                        linkValue, isForward, url);
                 } else {
                     if (isRedirectToUrl) {
                         // This is a redirect toUrl - use as path directly, with site resolution
                         url = resolveRedirectPath(linkValue, node, isForward, asExternal);
-                        LOGGER.debug("RedirectsService: Redirect path detected: {}, resolved to: {}", 
-                            linkValue, url);
                     } else {
                         // This is a redirect link - treat as node identifier
                         Node nodeFromId = getNodeFromId(linkValue);
                         url = createTargetLinkForPage(nodeFromId, isForward, asExternal);
-                        LOGGER.debug("RedirectsService: Internal link, nodeFromId: {}, final url: {}", 
-                            nodeFromId != null ? "found" : "null", url);
                     }
                 }
             }
@@ -302,8 +272,6 @@ public class RedirectsService {
                     suffix = resolvePlaceholders(suffix, extractedParams);
                 }
                 url += defaultString(suffix);
-                
-                LOGGER.debug("RedirectsService: Added suffix: {}, final url with suffix: {}", suffix, url);
             }
         }
         return url;
@@ -352,8 +320,6 @@ public class RedirectsService {
      */
     public List<Node> queryForRedirectNodes(final String redirect, final String siteName) {
         List<Node> nodes = Collections.emptyList();
-        
-        LOGGER.debug("RedirectsService: Querying for redirect nodes - redirect: {}, siteName: {}", redirect, siteName);
 
         try {
             Session jcrSession = getJCRSession(RedirectsModule.WORKSPACE);
@@ -361,65 +327,32 @@ public class RedirectsService {
 
             // First try redirect query
             Query query;
-            String queryString;
             if (NullSite.SITE_NAME.equals(siteName)) {
-                queryString = QUERY;
                 query = queryManager.createQuery(QUERY, JCR_SQL2);
                 query.bindValue(PN_REDIRECT, new StringValue(redirect));
-                LOGGER.debug("RedirectsService: Using redirect query without site filter: {}", queryString);
             } else {
-                queryString = QUERY_WITH_SITE;
                 query = queryManager.createQuery(QUERY_WITH_SITE, JCR_SQL2);
                 query.bindValue(PN_REDIRECT, new StringValue(redirect));
                 query.bindValue(PN_SITE, new StringValue(siteName));
-                LOGGER.debug("RedirectsService: Using redirect query with site filter: {}, binding site: {}", queryString, siteName);
             }
 
             QueryResult queryResult = query.execute();
             nodes = asList(asIterable(queryResult.getNodes()));
             
-            LOGGER.debug("RedirectsService: Redirect query executed, found {} nodes", nodes.size());
-            
             // If no redirect nodes found, try redirect query
             if (nodes.isEmpty()) {
-                LOGGER.debug("RedirectsService: No redirect nodes found, trying redirect query");
                 
                 if (NullSite.SITE_NAME.equals(siteName)) {
-                    queryString = QUERY_REDIRECT;
                     query = queryManager.createQuery(QUERY_REDIRECT, JCR_SQL2);
                     query.bindValue(PN_FROM_URL, new StringValue(redirect));
-                    LOGGER.debug("RedirectsService: Using redirect query without site filter: {}", queryString);
                 } else {
-                    queryString = QUERY_REDIRECT_WITH_SITE;
                     query = queryManager.createQuery(QUERY_REDIRECT_WITH_SITE, JCR_SQL2);
                     query.bindValue(PN_FROM_URL, new StringValue(redirect));
                     query.bindValue(PN_SITE, new StringValue(siteName));
-                    LOGGER.debug("RedirectsService: Using redirect query with site filter: {}, binding site: {}", queryString, siteName);
                 }
                 
                 queryResult = query.execute();
                 nodes = asList(asIterable(queryResult.getNodes()));
-                
-                LOGGER.debug("RedirectsService: Redirect query executed, found {} nodes", nodes.size());
-            }
-                
-            if (!nodes.isEmpty()) {
-                for (int i = 0; i < nodes.size(); i++) {
-                    Node node = nodes.get(i);
-                    try {
-                        String nodeRedirect = getString(node, PN_REDIRECT, "");
-                        String nodeFromUrl = getString(node, PN_FROM_URL, "");
-                        String nodeSite = getString(node, PN_SITE, "");
-                        String nodeLink = getString(node, PN_LINK, "");
-                        String nodeToUrl = getString(node, PN_TO_URL, "");
-                        String nodeType = getString(node, PN_TYPE, "");
-                        String nodeRedirectType = getString(node, PN_REDIRECT_TYPE, "");
-                        LOGGER.debug("RedirectsService: Found node[{}] - path: {}, redirect: {}, fromUrl: {}, site: {}, link: {}, toUrl: {}, type: {}, redirectType: {}", 
-                            i, node.getPath(), nodeRedirect, nodeFromUrl, nodeSite, nodeLink, nodeToUrl, nodeType, nodeRedirectType);
-                    } catch (RepositoryException e) {
-                        LOGGER.warn("RedirectsService: Error reading properties from node[{}]: {}", i, e.getMessage());
-                    }
-                }
             }
         } catch (RepositoryException e) {
             LOGGER.error("RedirectsService: Error executing query for redirect: {} with site: {}", redirect, siteName, e);
@@ -436,8 +369,6 @@ public class RedirectsService {
      */
     public List<Node> queryForPatternRedirectNodes(final String siteName) {
         List<Node> nodes = Collections.emptyList();
-        
-        LOGGER.debug("RedirectsService: Querying for pattern redirect nodes with siteName: {}", siteName);
 
         try {
             Session jcrSession = getJCRSession(RedirectsModule.WORKSPACE);
@@ -445,40 +376,27 @@ public class RedirectsService {
 
             // First try redirect pattern query
             Query query;
-            String queryString;
             if (NullSite.SITE_NAME.equals(siteName)) {
-                queryString = QUERY_PATTERN;
                 query = queryManager.createQuery(QUERY_PATTERN, JCR_SQL2);
-                LOGGER.debug("RedirectsService: Using redirect pattern query without site filter: {}", queryString);
             } else {
-                queryString = QUERY_PATTERN_WITH_SITE;
                 query = queryManager.createQuery(QUERY_PATTERN_WITH_SITE, JCR_SQL2);
                 query.bindValue(PN_SITE, new StringValue(siteName));
-                LOGGER.debug("RedirectsService: Using redirect pattern query with site filter: {}, binding site: {}", queryString, siteName);
             }
 
             QueryResult queryResult = query.execute();
             nodes = asList(asIterable(queryResult.getNodes()));
             
-            LOGGER.debug("RedirectsService: Redirect pattern query executed, found {} pattern nodes", nodes.size());
-            
             // Also try redirect pattern query
             List<Node> redirectNodes;
             if (NullSite.SITE_NAME.equals(siteName)) {
-                queryString = QUERY_REDIRECT_PATTERN;
                 query = queryManager.createQuery(QUERY_REDIRECT_PATTERN, JCR_SQL2);
-                LOGGER.debug("RedirectsService: Using redirect pattern query without site filter: {}", queryString);
             } else {
-                queryString = QUERY_REDIRECT_PATTERN_WITH_SITE;
                 query = queryManager.createQuery(QUERY_REDIRECT_PATTERN_WITH_SITE, JCR_SQL2);
                 query.bindValue(PN_SITE, new StringValue(siteName));
-                LOGGER.debug("RedirectsService: Using redirect pattern query with site filter: {}, binding site: {}", queryString, siteName);
             }
             
             queryResult = query.execute();
             redirectNodes = asList(asIterable(queryResult.getNodes()));
-            
-            LOGGER.debug("RedirectsService: Redirect pattern query executed, found {} redirect pattern nodes", redirectNodes.size());
             
             // Combine both result sets
             if (!redirectNodes.isEmpty()) {
@@ -489,20 +407,6 @@ public class RedirectsService {
                     List<Node> combinedNodes = new java.util.ArrayList<>(nodes);
                     combinedNodes.addAll(redirectNodes);
                     nodes = combinedNodes;
-                }
-            }
-                
-            for (int i = 0; i < nodes.size(); i++) {
-                Node node = nodes.get(i);
-                try {
-                    String nodeRedirect = getString(node, PN_REDIRECT, "");
-                    String nodeFromUrl = getString(node, PN_FROM_URL, "");
-                    String nodeSite = getString(node, PN_SITE, "");
-                    boolean usePattern = PropertyUtil.getBoolean(node, PN_USE_PATTERN, false);
-                    LOGGER.info("RedirectsService: Pattern node[{}] - path: {}, redirect: {}, fromUrl: {}, site: {}, usePattern: {}", 
-                        i, node.getPath(), nodeRedirect, nodeFromUrl, nodeSite, usePattern);
-                } catch (RepositoryException e) {
-                    LOGGER.warn("RedirectsService: Error reading properties from pattern node[{}]: {}", i, e.getMessage());
                 }
             }
         } catch (RepositoryException e) {
@@ -531,7 +435,6 @@ public class RedirectsService {
             node = jcrSession.getNodeByIdentifier(nodeId);
         } catch (RepositoryException e) {
             LOGGER.info("Error getting node for {}.", nodeId);
-            LOGGER.debug("Error getting node for {}.", nodeId, e);
         }
         return node;
     }
@@ -550,8 +453,6 @@ public class RedirectsService {
     public static Pattern convertToRegexPattern(String pattern) {
         String regex = pattern;
         
-        LOGGER.debug("RedirectsService: Converting pattern: {}", pattern);
-        
         // Check if this is already a regex pattern (contains unescaped parentheses or brackets)
         boolean isAlreadyRegex = pattern.contains("(") || pattern.contains("[") || pattern.contains("^") || pattern.contains("$");
         
@@ -563,7 +464,6 @@ public class RedirectsService {
             if (!regex.endsWith("$")) {
                 regex = regex + "$";
             }
-            LOGGER.debug("RedirectsService: Using pattern as regex: {}", regex);
         } else {
             // Convert simple pattern to regex
             // Escape special regex characters except * and {}
@@ -574,7 +474,6 @@ public class RedirectsService {
             regex = regex.replaceAll("\\*", ".*");
             // Ensure exact match
             regex = "^" + regex + "$";
-            LOGGER.debug("RedirectsService: Converted simple pattern to regex: {}", regex);
         }
         
         return Pattern.compile(regex);
@@ -591,9 +490,6 @@ public class RedirectsService {
         Pattern regex = convertToRegexPattern(pattern);
         Matcher matcher = regex.matcher(requestUrl);
         
-        LOGGER.debug("RedirectsService: matchPattern - requestUrl: {}, pattern: {}, regex: {}", 
-            requestUrl, pattern, regex.pattern());
-        
         if (matcher.matches()) {
             Map<String, String> params = new HashMap<>();
             
@@ -602,7 +498,6 @@ public class RedirectsService {
                 String groupValue = matcher.group(i);
                 if (groupValue != null) {
                     params.put(String.valueOf(i), groupValue);
-                    LOGGER.debug("RedirectsService: Captured group {}: {}", i, groupValue);
                 }
             }
             
@@ -615,18 +510,13 @@ public class RedirectsService {
                     String groupValue = matcher.group(groupName);
                     if (groupValue != null) {
                         params.put(groupName, groupValue);
-                        LOGGER.debug("RedirectsService: Captured named group {}: {}", groupName, groupValue);
                     }
                 } catch (IllegalArgumentException e) {
                     // Group not found, skip
                 }
             }
-            
-            LOGGER.debug("RedirectsService: Pattern matched! Extracted params: {}", params);
             return params;
         }
-        
-        LOGGER.debug("RedirectsService: Pattern did not match");
         return null;
     }
 
@@ -640,8 +530,6 @@ public class RedirectsService {
     public static String resolvePlaceholders(String targetUrl, Map<String, String> parameters) {
         String resolved = targetUrl;
         
-        LOGGER.debug("RedirectsService: resolvePlaceholders - targetUrl: {}, parameters: {}", targetUrl, parameters);
-        
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
@@ -652,16 +540,12 @@ public class RedirectsService {
             
             if (resolved.contains(bracketPlaceholder)) {
                 resolved = resolved.replace(bracketPlaceholder, value);
-                LOGGER.debug("RedirectsService: Replaced {} with {}", bracketPlaceholder, value);
             }
             
             if (resolved.contains(dollarPlaceholder)) {
                 resolved = resolved.replace(dollarPlaceholder, value);
-                LOGGER.debug("RedirectsService: Replaced {} with {}", dollarPlaceholder, value);
             }
         }
-        
-        LOGGER.debug("RedirectsService: Final resolved URL: {}", resolved);
         return resolved;
     }
     
@@ -680,23 +564,18 @@ public class RedirectsService {
         
         try {
             String siteName = getString(redirectNode, PN_SITE, EMPTY);
-            LOGGER.debug("RedirectsService: Resolving redirect path: {} for site: {}", redirectPath, siteName);
             
             if (isExternalLink(redirectPath)) {
                 // External URL - use as is
                 url = redirectPath;
-                LOGGER.debug("RedirectsService: External redirect path: {}", url);
             } else {
                 // Internal path - for redirects, use path as-is since site mapping handles the routing
                 // Only add site prefix if the path explicitly starts with a different site name
                 url = redirectPath;
                 
-                LOGGER.debug("RedirectsService: Using redirect path as-is (site mapping will handle routing): {} -> {}", redirectPath, url);
-                
                 // If this is for external use and we have a context path, we might need to adjust
                 if (asExternal && isNotBlank(_contextPath) && !url.startsWith(_contextPath)) {
                     url = _contextPath + url;
-                    LOGGER.debug("RedirectsService: Added context path for external use: {}", url);
                 }
             }
         } catch (Exception e) {

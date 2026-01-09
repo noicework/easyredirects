@@ -4,11 +4,10 @@ datasource:
 model:
   nodeType: mgnl:redirect
   properties:
-    - name: redirect
+    - name: fromUrl
     - name: site
-    - name: link
-    - name: linkSuffix
-    - name: type
-      options:
-        - value: forward
+    - name: toUrl
+    - name: toUrlSuffix
+    - name: redirectType
+    - name: usePattern
     - name: description

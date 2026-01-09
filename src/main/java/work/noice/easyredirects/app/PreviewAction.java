@@ -27,10 +27,8 @@ import info.magnolia.ui.api.location.DefaultLocation;
 import info.magnolia.ui.api.location.Location;
 import info.magnolia.ui.api.location.LocationController;
 import info.magnolia.ui.contentapp.action.OpenLocationActionDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.jcr.Node;
 
 import static info.magnolia.ui.api.location.Location.LOCATION_TYPE_APP;
@@ -42,7 +40,6 @@ import static info.magnolia.ui.api.location.Location.LOCATION_TYPE_APP;
  * @since 06.05.14
  */
 public class PreviewAction extends AbstractAction<OpenLocationActionDefinition> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewAction.class);
 
     private final LocationController _locationController;
     private final ValueContext<Node> _valueContext;
@@ -57,7 +54,6 @@ public class PreviewAction extends AbstractAction<OpenLocationActionDefinition> 
 
     @Override
     public void execute() {
-        LOGGER.debug("Execute preview action ...");
         if (_valueContext.getSingle().isPresent()) {
             String link = _redirectsService.createPreviewUrl(_valueContext.getSingle().get());
             Location location = new DefaultLocation(LOCATION_TYPE_APP, getDefinition().getAppName(), getDefinition().getSubAppId(), link);

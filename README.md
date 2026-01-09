@@ -22,9 +22,10 @@ A powerful and flexible redirect management module for Magnolia DXP, evolved fro
 ## Installation
 
 ### Prerequisites
-- Magnolia DXP 6.2 or higher
-- Java 11 or higher
+- Magnolia DXP 6.4+ (for Magnolia 6.2.x, use version 1.2.0)
+- Java 17 or higher
 - Maven 3.6+
+- Tomcat 10+ (Jakarta EE 10)
 
 ### Maven Dependency
 Add the following dependency to your Magnolia bundle:
@@ -33,9 +34,11 @@ Add the following dependency to your Magnolia bundle:
 <dependency>
     <groupId>work.noice</groupId>
     <artifactId>easyredirects</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
+
+> **Note for Magnolia 6.2.x users:** Use version 1.2.0 which supports Magnolia 6.2.x with Java 11+ and Tomcat 9.
 
 ### Module Installation
 1. Add the dependency to your project

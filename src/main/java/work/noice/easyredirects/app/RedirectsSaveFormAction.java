@@ -41,7 +41,7 @@ import info.magnolia.ui.observation.DatasourceObservation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.util.List;

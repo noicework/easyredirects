@@ -29,8 +29,8 @@ import info.magnolia.virtualuri.VirtualUriMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.net.URI;
@@ -81,25 +81,15 @@ public class VirtualRedirectsUriMapping implements VirtualUriMapping {
             String redirect = extractPath(uri);
             
             if (isRedirectCandidate(redirect)) {
-                LOGGER.debug("RedirectsUriMapping: URI is redirect candidate: {}", redirect);
-                
                 // Extract site and clean redirect URL
                 SiteUrlInfo siteUrlInfo = extractSiteFromUrl(redirect);
                 final String siteName = siteUrlInfo.getSiteName() != null ? siteUrlInfo.getSiteName() : retrieveSite(redirect);
                 final String cleanRedirect = siteUrlInfo.getRedirect();
                 
-                LOGGER.debug("RedirectsUriMapping: Site extraction - original: {}, extracted site: {}, clean redirect URL: {}", 
-                    redirect, siteName, cleanRedirect);
-                
                 String toUri = getUriOfRedirect(siteName, cleanRedirect, Optional.ofNullable(uri.getQuery()).map(value -> "?" + value).orElse(null));
                 
                 if (isNotBlank(toUri)) {
-                    LOGGER.debug("RedirectsUriMapping: Found redirect mapping - from: {} (site: {}) to: {}", 
-                        cleanRedirect, siteName, toUri);
                     result = Optional.of(new Result(toUri, redirect.length(), this));
-                } else {
-                    LOGGER.debug("RedirectsUriMapping: No redirect mapping found for redirect URL: {} with site: {}", 
-                        cleanRedirect, siteName);
                 }
             }
         } catch (PatternSyntaxException e) {
@@ -133,9 +123,6 @@ public class VirtualRedirectsUriMapping implements VirtualUriMapping {
     protected String getUriOfRedirect(String siteName, final String redirect, String originSuffix) {
         Node node = null;
         Map<String, String> extractedParams = null;
-        
-        LOGGER.debug("RedirectsUriMapping: Searching for redirect node - redirect: {}, siteName: {}, originSuffix: {}", 
-            redirect, siteName, originSuffix);
 
         try {
             // do it in the system context, so the anonymous need no read rights for using redirects
@@ -143,21 +130,12 @@ public class VirtualRedirectsUriMapping implements VirtualUriMapping {
                 (MgnlContext.Op<Node, RepositoryException>) () -> _redirectsService.get().queryForRedirectNode(redirect, siteName)
             );
             
-            if (node != null) {
-                LOGGER.debug("RedirectsUriMapping: Found exact match node for redirect: {} with site: {}", redirect, siteName);
-            } else {
-                LOGGER.debug("RedirectsUriMapping: No exact match found for redirect: {} with site: {}, trying pattern matching", 
-                    redirect, siteName);
-            }
-
             // If no exact match found, try pattern matching
             if (node == null) {
                 final String finalRedirect = redirect;
                 List<Node> patternNodes = MgnlContext.doInSystemContext(
                     (MgnlContext.Op<List<Node>, RepositoryException>) () -> _redirectsService.get().queryForPatternRedirectNodes(siteName)
                 );
-                
-                LOGGER.debug("RedirectsUriMapping: Found {} pattern nodes for site: {}", patternNodes.size(), siteName);
 
                 // Check each pattern node for a match
                 for (Node patternNode : patternNodes) {
@@ -168,21 +146,13 @@ public class VirtualRedirectsUriMapping implements VirtualUriMapping {
                     }
                     
                     if (isNotEmpty(pattern)) {
-                        LOGGER.debug("RedirectsUriMapping: Testing pattern: {} against redirect: {}", pattern, finalRedirect);
                         Map<String, String> params = RedirectsService.matchPattern(finalRedirect, pattern);
                         if (params != null) {
-                            LOGGER.debug("RedirectsUriMapping: Pattern match found! Pattern: {}, extracted params: {}", 
-                                pattern, params);
                             node = patternNode;
                             extractedParams = params;
                             break;
                         }
                     }
-                }
-                
-                if (node == null) {
-                    LOGGER.debug("RedirectsUriMapping: No pattern matches found for redirect: {} with site: {}", 
-                        finalRedirect, siteName);
                 }
             }
         } catch (RepositoryException e) {
@@ -190,8 +160,6 @@ public class VirtualRedirectsUriMapping implements VirtualUriMapping {
         }
 
         String result = node == null ? EMPTY : createUrlForRedirectNode(node, originSuffix, extractedParams);
-        LOGGER.debug("RedirectsUriMapping: Final result for redirect: {} with site: {} is: {}", 
-            redirect, siteName, result.isEmpty() ? "[EMPTY]" : result);
         return result;
     }
 
@@ -244,7 +212,6 @@ public class VirtualRedirectsUriMapping implements VirtualUriMapping {
      * @return SiteUrlInfo containing the extracted site name and cleaned redirect URL
      */
     protected SiteUrlInfo extractSiteFromUrl(String redirect) {
-        LOGGER.debug("RedirectsUriMapping: Extracting site from URL: {}", redirect);
         
         String siteName = null;
         String cleanRedirect = redirect;
@@ -255,38 +222,22 @@ public class VirtualRedirectsUriMapping implements VirtualUriMapping {
                 String pathWithoutLeadingSlash = removeStart(redirect, "/");
                 int nextSlashIndex = pathWithoutLeadingSlash.indexOf('/');
                 
-                LOGGER.debug("RedirectsUriMapping: Path without leading slash: {}, next slash index: {}", 
-                    pathWithoutLeadingSlash, nextSlashIndex);
-                
                 if (nextSlashIndex > 0) {
                     String potentialSiteName = pathWithoutLeadingSlash.substring(0, nextSlashIndex);
                     String remainingPath = pathWithoutLeadingSlash.substring(nextSlashIndex);
                     
-                    LOGGER.debug("RedirectsUriMapping: Checking potential site name: {}, remaining path: {}", 
-                        potentialSiteName, remainingPath);
-                    
                     // Check if this is a valid site name
                     try {
                         if (_siteManager.get().getSite(potentialSiteName) != null) {
-                            LOGGER.debug("RedirectsUriMapping: Valid site found! Site: {}, extracted redirect URL: {}", 
-                                potentialSiteName, remainingPath);
                             siteName = potentialSiteName;
                             cleanRedirect = remainingPath;
-                        } else {
-                            LOGGER.debug("RedirectsUriMapping: '{}' is not a valid site name", potentialSiteName);
                         }
                     } catch (Exception e) {
-                        LOGGER.debug("RedirectsUriMapping: Exception checking site '{}': {}, treating as regular redirect URL", 
-                            potentialSiteName, e.getMessage());
+                        // Intentionally ignored – missing site should not block redirect resolution
                     }
                 }
             }
-        } else {
-            LOGGER.debug("RedirectsUriMapping: SiteManager not available, no site extraction possible");
         }
-        
-        LOGGER.debug("RedirectsUriMapping: Extraction complete - site: {}, redirect: {}", 
-            siteName != null ? siteName : "[null]", cleanRedirect);
         return new SiteUrlInfo(siteName, cleanRedirect);
     }
     

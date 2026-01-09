@@ -20,18 +20,14 @@ package work.noice.easyredirects;
  * #L%
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javax.jcr.Node;
 
 import static work.noice.easyredirects.RedirectsService.PN_LINK;
 import static work.noice.easyredirects.RedirectsService.PN_SUFFIX;
 import static work.noice.easyredirects.RedirectsService.PN_REDIRECT;
 import static work.noice.easyredirects.RedirectsService.isExternalLink;
-import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static info.magnolia.jcr.util.PropertyUtil.getString;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -43,7 +39,6 @@ import static org.apache.commons.lang3.StringUtils.replaceOnce;
  * Uses just the configured server prefix for external link creation.
  */
 public class SimplePublicUrlService implements PublicUrlService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimplePublicUrlService.class);
 
     @Inject
     @Named(value = "magnolia.contextpath")
@@ -53,13 +48,11 @@ public class SimplePublicUrlService implements PublicUrlService {
 
     @Override
     public String createRedirectUrl(final Node node) {
-        LOGGER.debug("Create redirect url for node {}", getPathIfPossible(node));
         return normalizePrefix() + getString(node, PN_REDIRECT, EMPTY);
     }
 
     @Override
     public String createTargetUrl(final Node node) {
-        LOGGER.debug("Create target url for node {}", getPathIfPossible(node));
         String url = EMPTY;
         if (node != null) {
             url = getString(node, PN_LINK, EMPTY);

@@ -22,10 +22,8 @@ package work.noice.easyredirects;
 
 import info.magnolia.cms.beans.config.URI2RepositoryMapping;
 import info.magnolia.module.site.SiteManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.jcr.Node;
 import java.net.URI;
 import java.util.Map;
@@ -43,22 +41,16 @@ import static org.apache.commons.lang3.StringUtils.substringAfter;
  * @author frank.sommer
  */
 public class HeadlessVirtualRedirectsUriMapping extends VirtualRedirectsUriMapping {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HeadlessVirtualRedirectsUriMapping.class);
 
     private SiteManager _siteManager;
 
     @Override
     protected String extractPath(URI uri) {
         String path = EMPTY;
-        
-        LOGGER.debug("HeadlessRedirectsUriMapping: Extracting path from URI: {}", uri.toString());
 
         final String headlessEndpoint = getRedirectsModule().getHeadlessEndpoint();
         if (isNotBlank(headlessEndpoint)) {
             path = substringAfter(uri.getPath(), headlessEndpoint);
-            LOGGER.debug("HeadlessRedirectsUriMapping: Headless endpoint: {}, extracted path: {}", headlessEndpoint, path);
-        } else {
-            LOGGER.debug("HeadlessRedirectsUriMapping: No headless endpoint configured, using empty path");
         }
 
         return path;
@@ -67,31 +59,21 @@ public class HeadlessVirtualRedirectsUriMapping extends VirtualRedirectsUriMappi
     @Override
     protected String retrieveSite(String redirect) {
         String siteName = _siteManager.getAssignedSite("", redirect).getName();
-        LOGGER.debug("HeadlessRedirectsUriMapping: Retrieved site for redirect {}: {}", redirect, siteName);
         return siteName;
     }
     
     @Override
     protected SiteUrlInfo extractSiteFromUrl(String redirect) {
-        LOGGER.debug("HeadlessRedirectsUriMapping: Extracting site from URL in headless mode: {}", redirect);
         
         // For headless mode, use the site manager to determine site assignment
         // but still allow site prefix extraction for compatibility
         SiteUrlInfo siteInfo = super.extractSiteFromUrl(redirect);
         
-        LOGGER.debug("HeadlessRedirectsUriMapping: Parent extraction result - site: {}, redirect: {}", 
-            siteInfo.getSiteName(), siteInfo.getRedirect());
-        
         // If no site was extracted from URL, use the site manager assignment
         if (siteInfo.getSiteName() == null) {
             String assignedSiteName = _siteManager.getAssignedSite("", redirect).getName();
-            LOGGER.debug("HeadlessRedirectsUriMapping: No site extracted from URL, using site manager assignment: {}", 
-                assignedSiteName);
             return new SiteUrlInfo(assignedSiteName, siteInfo.getRedirect());
         }
-        
-        LOGGER.debug("HeadlessRedirectsUriMapping: Using extracted site info - site: {}, redirect: {}", 
-            siteInfo.getSiteName(), siteInfo.getRedirect());
         return siteInfo;
     }
 

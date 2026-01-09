@@ -34,7 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +56,7 @@ import static org.mockito.Mockito.when;
 public class VirtualRedirectsUriMappingTest {
 
     private VirtualRedirectsUriMapping _uriMapping;
+    private RedirectsService _redirectsService;
 
     @Test
     public void testRootRequest() throws Exception {
@@ -67,6 +68,18 @@ public class VirtualRedirectsUriMappingTest {
     public void testPageRequest() throws Exception {
         Optional<VirtualUriMapping.Result> mappingResult = _uriMapping.mapUri(new URI("/home.html"));
         assertThat(mappingResult.isPresent(), is(false));
+    }
+
+    @Test
+    public void testPhpPageRequestIsSupported() throws Exception {
+        MockNode phpNode = new MockNode("terms");
+        when(_redirectsService.queryForRedirectNode("/terms.php", NullSite.SITE_NAME)).thenReturn(phpNode);
+        when(_redirectsService.createRedirectUrl(phpNode, null)).thenReturn("redirect:/terms-latest");
+        when(_redirectsService.createRedirectUrl(phpNode, null, null)).thenReturn("redirect:/terms-latest");
+
+        Optional<VirtualUriMapping.Result> mappingResult = _uriMapping.mapUri(new URI("/terms.php"));
+        assertThat(mappingResult.isPresent(), is(true));
+        assertThat(mappingResult.get().getToUri(), equalTo("redirect:/terms-latest"));
     }
 
     @Test
@@ -120,29 +133,29 @@ public class VirtualRedirectsUriMappingTest {
         Provider<RedirectsModule> moduleProvider = mock(Provider.class);
         RedirectsModule module = new RedirectsModule();
         Map<String, String> excludes = new HashMap<>();
-        excludes.put("pages", ".*\\..*");
+        excludes.put("pages", "(?i).*\\.(css|js|png|gif|jpe?g|ico|svg|webp|avif|woff2?|ttf|otf|eot|map|json|xml|html?|jsp|jspx|asp|aspx|pdf|docx?|xlsx?|pptx?|txt|csv|zip|gz|tar|mp4|mp3|webm|ogg)$");
         module.setExcludes(excludes);
         when(moduleProvider.get()).thenReturn(module);
         _uriMapping.setRedirectsModule(moduleProvider);
 
         @SuppressWarnings("unchecked")
         Provider<RedirectsService> serviceProvider = mock(Provider.class);
-        RedirectsService redirectsService = mock(RedirectsService.class);
-        when(redirectsService.queryForRedirectNode("/home", NullSite.SITE_NAME)).thenReturn(null);
+        _redirectsService = mock(RedirectsService.class);
+        when(_redirectsService.queryForRedirectNode("/home", NullSite.SITE_NAME)).thenReturn(null);
 
         MockNode mockNode = new MockNode("xmas");
-        when(redirectsService.queryForRedirectNode("/xmas", NullSite.SITE_NAME)).thenReturn(mockNode);
+        when(_redirectsService.queryForRedirectNode("/xmas", NullSite.SITE_NAME)).thenReturn(mockNode);
         
         // Mock site-specific redirect URL
         MockNode siteSpecificNode = new MockNode("test");
-        when(redirectsService.queryForRedirectNode("/test", "Dotmar")).thenReturn(siteSpecificNode);
-        when(redirectsService.queryForRedirectNode("/test", NullSite.SITE_NAME)).thenReturn(null);
+        when(_redirectsService.queryForRedirectNode("/test", "Dotmar")).thenReturn(siteSpecificNode);
+        when(_redirectsService.queryForRedirectNode("/test", NullSite.SITE_NAME)).thenReturn(null);
 
-        when(redirectsService.createRedirectUrl(mockNode, null)).thenReturn("redirect:/internal/page.html");
-        when(redirectsService.createRedirectUrl(mockNode, null, null)).thenReturn("redirect:/internal/page.html");
-        when(redirectsService.createRedirectUrl(siteSpecificNode, null)).thenReturn("redirect:/products.html");
-        when(redirectsService.createRedirectUrl(siteSpecificNode, null, null)).thenReturn("redirect:/products.html");
-        when(serviceProvider.get()).thenReturn(redirectsService);
+        when(_redirectsService.createRedirectUrl(mockNode, null)).thenReturn("redirect:/internal/page.html");
+        when(_redirectsService.createRedirectUrl(mockNode, null, null)).thenReturn("redirect:/internal/page.html");
+        when(_redirectsService.createRedirectUrl(siteSpecificNode, null)).thenReturn("redirect:/products.html");
+        when(_redirectsService.createRedirectUrl(siteSpecificNode, null, null)).thenReturn("redirect:/products.html");
+        when(serviceProvider.get()).thenReturn(_redirectsService);
         _uriMapping.setRedirectsService(serviceProvider);
         
         // Mock SiteManager

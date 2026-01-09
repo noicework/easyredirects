@@ -22,11 +22,9 @@ import info.magnolia.cms.beans.config.ServerConfiguration;
 import info.magnolia.module.site.Domain;
 import info.magnolia.module.site.Site;
 import info.magnolia.module.site.SiteManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javax.jcr.Node;
 import java.util.Collection;
 
@@ -36,7 +34,6 @@ import static work.noice.easyredirects.RedirectsService.PN_SITE;
 import static work.noice.easyredirects.RedirectsService.PN_SUFFIX;
 import static work.noice.easyredirects.RedirectsService.PN_REDIRECT;
 import static work.noice.easyredirects.RedirectsService.isExternalLink;
-import static info.magnolia.jcr.util.NodeUtil.getPathIfPossible;
 import static info.magnolia.jcr.util.PropertyUtil.getString;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -50,7 +47,6 @@ import static org.apache.commons.lang3.StringUtils.replaceOnce;
  * @since 16.10.14
  */
 public class DefaultPublicUrlService implements PublicUrlService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPublicUrlService.class);
 
     private String _targetContextPath = EMPTY;
 
@@ -63,7 +59,6 @@ public class DefaultPublicUrlService implements PublicUrlService {
 
     @Override
     public String createRedirectUrl(final Node node) {
-        LOGGER.debug("Create redirect url for node {}", getPathIfPossible(node));
         // the default base url is the default
         String baseUrl = _serverConfiguration.getDefaultBaseUrl();
         baseUrl = replaceContextPath(baseUrl);
@@ -98,7 +93,6 @@ public class DefaultPublicUrlService implements PublicUrlService {
 
     @Override
     public String createTargetUrl(final Node node) {
-        LOGGER.debug("Create target url for node {}", getPathIfPossible(node));
         String url = EMPTY;
         if (node != null) {
             url = getString(node, PN_LINK, EMPTY);

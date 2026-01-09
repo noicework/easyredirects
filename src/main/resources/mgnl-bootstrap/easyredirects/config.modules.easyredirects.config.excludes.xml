@@ -4,6 +4,6 @@
     <sv:value>mgnl:contentNode</sv:value>
   </sv:property>
   <sv:property sv:name="dotall" sv:type="String">
-    <sv:value>.*\..*</sv:value>
+    <sv:value>(?i).*\\.(css|js|png|gif|jpe?g|ico|svg|webp|avif|woff2?|ttf|otf|eot|map|json|xml|html?|jsp|jspx|asp|aspx|pdf|docx?|xlsx?|pptx?|txt|csv|zip|gz|tar|mp4|mp3|webm|ogg)$</sv:value>
   </sv:property>
 </sv:node>

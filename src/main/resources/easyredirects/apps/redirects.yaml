@@ -1,117 +1,154 @@
-!content-type:redirect
-name: redirects
 icon: redirects-icon
 label: redirects.app.label
-datasource:
+appClass: info.magnolia.ui.framework.app.BaseApp
+class: info.magnolia.ui.contentapp.configuration.ContentAppDescriptor
+
+datasource: &datasource
+  $type: jcrDatasource
   workspace: redirects
+  allowedNodeTypes:
+    - mgnl:redirect
+    - mgnl:folder
+
 subApps:
   browser:
-    label: redirects.app.label
-    actionbar:
-      sections:
-        item:
-          groups:
-            editActions:
-              items: []
-        deletedItem:
-          groups:
-            editActions:
-              items: []
+    class: info.magnolia.ui.contentapp.configuration.BrowserDescriptor
     actions:
-      export:
-        format: XML
+      addRedirect:
+        icon: icon-add-item
+        $type: openDetailSubappAction
+        appName: redirects
+        subAppName: detail
+        viewType: add
+        availability:
+          writePermissionRequired: true
+          root: true
+      editRedirect:
+        icon: icon-edit
+        $type: openDetailSubappAction
+        appName: redirects
+        subAppName: detail
+        viewType: edit
+      deleteRedirect:
+        icon: icon-delete
+        $type: deleteNodesConfirmationAction
+      addFolder:
+        icon: icon-add-folder
+        $type: addNodeAction
+        nodeType: mgnl:folder
+        availability:
+          writePermissionRequired: true
+    actionbar:
+      defaultAction: editRedirect
+      sections:
+        - name: redirect
+          availability:
+            nodeTypes:
+              - mgnl:redirect
+          groups:
+            - name: editActions
+              items:
+                - name: editRedirect
+                - name: deleteRedirect
+        - name: folder
+          availability:
+            nodeTypes:
+              - mgnl:folder
+          groups:
+            - name: addActions
+              items:
+                - name: addRedirect
+                - name: addFolder
+            - name: editActions
+              items:
+                - name: deleteRedirect
+        - name: root
+          availability:
+            root: true
+          groups:
+            - name: addActions
+              items:
+                - name: addRedirect
+                - name: addFolder
     workbench:
-      $type: filteringWorkbench
-      sortFilterOptions: true
-      filters:
-        - name: jcrPublishingStatus
-          icon: icon-spinner-full
-          $type: dropdownMultiselect
-          datasource:
-            $type: enumDatasource
-            enumeration: info.magnolia.ui.contentapp.configuration.column.StatusColumnDefinition$PublicationStatus
-            sorted: true
-        - name: site
-          icon: icon-globe
-          $type: dropdownMultiselect
-          datasource:
-            $type: siteListDatasource
-            sorted: true
       contentViews:
-        tree:
-          filterableColumns: false
-          columns: !override
-            name:
-              $type: jcrComponentColumn
-              name: fromUrl
-              nodeTypeToComponents:
-                "mgnl:folder":
-                  icon: icon-folder-l
-                "mgnl:redirect":
-                  icon: icon-forward
-            site:
-              width: 100
-            toUrl:
+        - name: tree
+          $type: treeView
+          columns:
+            - name: jcrName
+              $type: jcrTitleColumn
+              propertyName: fromUrl
+              nodeTypeToIcon:
+                mgnl:redirect: icon-forward
+                mgnl:folder: icon-folder-l
+            - name: site
               $type: propertyColumn
-              name: toUrl
-              width: 400
-            jcrPublishingStatus:
-              $type: statusColumn
-            lastModified:
+              width: 100
+            - name: toUrl
+              $type: propertyColumn
+              width: 300
+            - name: mgnl:lastModified
               $type: dateColumn
-              name: mgnl:lastModified
-              width: 190
-    statusBar:
-      implementationClass: info.magnolia.ui.filteringapp.browser.FilteringStatusBar
+              width: 160
+
   detail:
+    class: info.magnolia.ui.contentapp.detail.DetailDescriptor
+    itemProvider:
+      $type: jcrNodeFromLocationProvider
+      workspace: redirects
+      nodeType: mgnl:redirect
     datasource:
+      <<: *datasource
       describeByProperty: fromUrl
-    form:
-      properties: !override
-        fromUrl:
-          $type: textField
-          required: true
-          validators:
-            valid:
-              $type: regexpValidator
-              errorMessage: redirect.errorMessage.invalid
-              pattern: ^/.+$
-          description: redirect.field.fromUrl.description
-        site:
-          $type: comboBoxField
-          defaultValue: fallback
-          required: true
-          datasource:
-            $type: siteListDatasource
-        toUrl:
-          $type: textField
-          required: true
-          description: redirect.field.toUrl.description
-        toUrlSuffix:
-          $type: textField
-        redirectType:
-          $type: radioButtonGroupField
-          defaultValue: 301
-          datasource:
-            $type: optionListDatasource
-            options:
-              - name: 301
-                value: 301
-              - name: 302
-                value: 302
-        usePattern:
-          $type: checkBoxField
-          label: redirect.field.usePattern.label
-          description: redirect.field.usePattern.description
-          defaultValue: false
-        description:
-          $type: textField
-          rows: 3
     actions:
       commit:
         $type: commitAction
       cancel:
         $type: closeAction
+    form:
+      properties:
+        - name: fromUrl
+          $type: textField
+          label: From URL
+          required: true
+          description: The URL path to redirect from (must start with /)
+        - name: site
+          $type: textField
+          label: Site
+          defaultValue: fallback
+          required: true
+          description: Site name (use 'fallback' for all sites)
+        - name: toUrl
+          $type: textField
+          label: To URL
+          required: true
+          description: The destination URL
+        - name: toUrlSuffix
+          $type: textField
+          label: URL Suffix
+        - name: redirectType
+          $type: radioButtonGroupField
+          label: Redirect Type
+          defaultValue: "301"
+          datasource:
+            $type: optionListDatasource
+            options:
+              - name: "301"
+                value: "301"
+                label: 301 Permanent
+              - name: "302"
+                value: "302"
+                label: 302 Temporary
+        - name: usePattern
+          $type: checkBoxField
+          label: Use Pattern
+          description: Enable pattern matching for dynamic redirects
+          defaultValue: false
+        - name: description
+          $type: textField
+          label: Description
+          rows: 3
+
 permissions:
   roles:
     canAccessRedirectsApp: canAccessRedirectsApp
