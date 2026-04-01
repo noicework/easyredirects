@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>work.noice</groupId>
     <artifactId>easyredirects</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
     <packaging>jar</packaging>
     <name>Easy Redirects for Magnolia DXP</name>
     <description>A powerful and flexible redirect management module for Magnolia DXP with comprehensive URL redirect capabilities, pattern matching, multi-site support, and seamless integration with Magnolia's content management system.</description>
@@ -40,7 +40,7 @@
         <magnolia.version>6.4.1</magnolia.version>
         <magnolia.content.types.version>3.0.0</magnolia.content.types.version>
         <magnolia.site.version>3.0.0</magnolia.site.version>
-        <qrgen.version>2.6.0</qrgen.version>
+
         <junit.version>4.13.2</junit.version>
         <mockito.version>5.12.0</mockito.version>
         <servlet.version>6.0.0</servlet.version>
@@ -91,11 +91,7 @@
             <version>${magnolia.site.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.kenglxn.QRGen</groupId>
-            <artifactId>javase</artifactId>
-            <version>${qrgen.version}</version>
-        </dependency>
+
 
         <dependency>
             <groupId>jakarta.servlet</groupId>

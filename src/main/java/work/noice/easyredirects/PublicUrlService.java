@@ -35,7 +35,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
  */
 public interface PublicUrlService {
     /**
-     * Builds the redirect url for the public instance. Needed for the qr code generation on author instance.
+     * Builds the redirect url for the public instance.
      *
      * @param node redirect node
      * @return redirect url

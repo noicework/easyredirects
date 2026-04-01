@@ -10,7 +10,7 @@ A powerful and flexible redirect management module for Magnolia DXP, evolved fro
 - **Pattern Matching**: Advanced wildcard and regex pattern support with parameter substitution
 - **Multi-site Support**: Site-specific redirects with automatic fallback mechanisms
 - **Exclusion Patterns**: Filter out unwanted patterns from redirect processing
-- **QR Code Generation**: Built-in QR code generation for easy mobile testing
+
 
 ### Advanced Features
 - **Backward Compatibility**: Supports both legacy (`toUri`, `fromUri`) and modern (`targetUrl`, `sourceUrl`) field naming
@@ -104,7 +104,7 @@ Define patterns to exclude from redirect processing in the dialog:
 1. Use the **Preview** action in the Redirects app
 2. The preview popup shows:
    - Redirect type and status
-   - QR code for mobile testing
+
    - Direct link to test the redirect
 
 ## API Usage

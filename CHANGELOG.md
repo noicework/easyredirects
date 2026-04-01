@@ -35,6 +35,6 @@ All notable changes to this project will be documented in this file.
 - Server-side forwards
 - Pattern matching with wildcards and regex
 - Multi-site support with fallback mechanisms
-- QR code generation for mobile testing
+
 - Headless CMS support
 - Backward compatibility with legacy field names
