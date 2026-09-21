@@ -14,8 +14,9 @@ mvn package -Dgpg.skip=true
 ```
 
 Do not run `mvn deploy` for a test build: this project's publishing plugin is
-configured to publish releases automatically. The candidate version is
-`2.1.1-SNAPSHOT`; assign the final release version through the normal release process.
+configured to publish releases automatically. The final release version is `2.1.1`.
+The `2.1.1-rc1` candidate passed VCC dev acceptance as reported by the tester.
+The final package must still be smoke-tested on dev before production promotion.
 
 ## Author and public acceptance checks
 

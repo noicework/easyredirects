@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>work.noice</groupId>
     <artifactId>easyredirects</artifactId>
-    <version>2.1.1-SNAPSHOT</version>
+    <version>2.1.1</version>
     <packaging>jar</packaging>
     <name>Easy Redirects for Magnolia DXP</name>
     <description>A powerful and flexible redirect management module for Magnolia DXP with comprehensive URL redirect capabilities, pattern matching, multi-site support, and seamless integration with Magnolia's content management system.</description>
