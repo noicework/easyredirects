@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] - 2026-09-21
+
+### Fixed
+- Restore explicit publishing, unpublishing, publication status, and deletion controls in Redirects.
+- Give new redirects readable, unique internal names derived from their From URL; preserve existing names and UUIDs when editing.
+- Use the supported classic form editor so Magnolia executes the custom Java save action.
+- Resolve module descriptor placeholders during packaging and fix column definition compatibility.
+
+### Validation
+- 43 automated module tests, local browser checks, and VCC dev acceptance of the 2.1.1-rc1 candidate.
+- No bulk renaming, changes to redirect matching, or automatic publication on save.
+
 ## [2.0.0] - 2025-01-09
 
 ### Breaking Changes

@@ -29,9 +29,85 @@ subApps:
         appName: redirects
         subAppName: detail
         viewType: edit
+        availability:
+          writePermissionRequired: true
+          rules:
+            notDeleted: &notDeleted
+              $type: jcrIsDeletedRule
+              negate: true
       deleteRedirect:
         icon: icon-delete
         $type: deleteNodesConfirmationAction
+        successActionName: markDeleted
+        availability:
+          multiple: true
+          writePermissionRequired: true
+          rules:
+            notDeleted: *notDeleted
+      markDeleted:
+        $type: markAsDeletedAction
+        command: markAsDeleted
+        datasourceRefreshBehavior: items
+        availability:
+          writePermissionRequired: true
+          rules:
+            notDeleted: *notDeleted
+      publish:
+        icon: icon-publish
+        $type: jcrCommandAction
+        catalog: versioned
+        command: publish
+        datasourceRefreshBehavior: items
+        availability:
+          multiple: true
+          writePermissionRequired: true
+          rules:
+            notDeleted: *notDeleted
+            isPublishable:
+              $type: jcrPublishableRule
+      unpublish:
+        icon: icon-unpublish
+        $type: jcrCommandAction
+        command: unpublish
+        datasourceRefreshBehavior: items
+        availability:
+          multiple: true
+          writePermissionRequired: true
+          rules:
+            notDeleted: *notDeleted
+            isPublished:
+              $type: jcrPublishedRule
+      deletePermanently:
+        icon: icon-delete
+        $type: confirmationAlertAction
+        successActionName: publishDeletion
+        availability:
+          multiple: true
+          writePermissionRequired: true
+          rules:
+            isDeleted: &isDeleted
+              $type: jcrIsDeletedRule
+      publishDeletion:
+        icon: icon-delete
+        $type: jcrCommandAction
+        catalog: versioned
+        command: publish
+        datasourceRefreshBehavior: items
+        availability:
+          multiple: true
+          writePermissionRequired: true
+          rules:
+            isDeleted: *isDeleted
+      restore:
+        icon: icon-rotate-image-ccw
+        $type: restorePreviousJcrVersionAction
+        datasourceRefreshBehavior: items
+        availability:
+          writePermissionRequired: true
+          rules:
+            isDeleted: *isDeleted
+            hasVersions:
+              $type: jcrHasVersionsRule
       addFolder:
         icon: icon-add-folder
         $type: addNodeAction
@@ -41,19 +117,42 @@ subApps:
     actionbar:
       defaultAction: editRedirect
       sections:
-        - name: redirect
+        # First matching section wins. Deleted items must precede normal items.
+        - name: deletedRedirect
           availability:
+            multiple: true
             nodeTypes:
               - mgnl:redirect
+              - mgnl:folder
+            rules:
+              isDeleted: *isDeleted
+          groups:
+            - name: publishingActions
+              items:
+                - name: deletePermanently
+                - name: restore
+        - name: redirect
+          availability:
+            multiple: true
+            nodeTypes:
+              - mgnl:redirect
+            rules:
+              notDeleted: *notDeleted
           groups:
             - name: editActions
               items:
                 - name: editRedirect
                 - name: deleteRedirect
+            - name: publishingActions
+              items:
+                - name: publish
+                - name: unpublish
         - name: folder
           availability:
             nodeTypes:
               - mgnl:folder
+            rules:
+              notDeleted: *notDeleted
           groups:
             - name: addActions
               items:
@@ -62,9 +161,14 @@ subApps:
             - name: editActions
               items:
                 - name: deleteRedirect
+            - name: publishingActions
+              items:
+                - name: publish
+                - name: unpublish
         - name: root
           availability:
             root: true
+            nodes: false
           groups:
             - name: addActions
               items:
@@ -82,14 +186,17 @@ subApps:
                 mgnl:redirect: icon-forward
                 mgnl:folder: icon-folder-l
             - name: site
-              $type: propertyColumn
+              class: info.magnolia.ui.contentapp.configuration.column.ConfiguredColumnDefinition
               width: 100
             - name: toUrl
-              $type: propertyColumn
+              class: info.magnolia.ui.contentapp.configuration.column.ConfiguredColumnDefinition
               width: 300
             - name: mgnl:lastModified
               $type: dateColumn
               width: 160
+            - name: jcrPublishingStatus
+              $type: statusColumn
+              label: Publication status
 
   detail:
     class: info.magnolia.ui.contentapp.detail.DetailDescriptor
@@ -103,9 +210,13 @@ subApps:
     actions:
       commit:
         $type: commitAction
+        implementationClass: work.noice.easyredirects.app.SaveRedirectAction
       cancel:
         $type: closeAction
     form:
+      # New UI Forms bypass custom Java commit actions; retain the supported
+      # Vaadin editor for this app so naming and normal save validation execute.
+      $type: vaadinForm
       properties:
         - name: fromUrl
           $type: textField
