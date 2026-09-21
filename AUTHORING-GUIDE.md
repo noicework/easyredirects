@@ -78,11 +78,28 @@ Add notes about why this redirect exists:
 - "2023 Christmas campaign - expires January"
 - "Department renamed from Services to Solutions"
 
-### Step 3: Save and Activate
+### Step 3: Save and Publish
 
 1. Click **Save** to create the redirect
-2. The redirect is automatically active once saved
-3. Test it immediately by visiting the "From URL"
+2. Select it in the list and click **Publish** to send it to the public instances. Saving alone does not publish it.
+3. Check the **Publication status** column, then test the "From URL" on the public website.
+
+New redirects receive a readable internal name based on their From URL. For example,
+`/about-us/governance/lleg` becomes `about-us-governance-lleg`. A unique suffix is
+added if that name is already in use. Existing names, including `untitled11`, are
+left unchanged when editing. This internal name does not change either URL.
+
+Publish again after editing an existing redirect. If it is inside a new folder,
+publish the parent folder first, then the redirect.
+
+### Unpublishing and deleting
+
+- **Unpublish** removes the redirect from the public instances but keeps it on author.
+- **Delete** follows Magnolia's deletion workflow. A previously published redirect
+  is marked for deletion; select it and use **Delete permanently** to publish the
+  deletion and finish removing it. An unpublished new record may be removed immediately.
+- **Restore** is available for a marked-deleted record when a previous version exists.
+- Publishing and deletion remain subject to your Magnolia permissions and the configured receivers.
 
 ## Common Redirect Scenarios
 
